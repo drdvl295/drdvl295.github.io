@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lecture audio</title>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding-top: 60px;
+      background: #f5f5f5;
+    }
+
+    button {
+      font-size: 28px;
+      padding: 20px 40px;
+      border-radius: 12px;
+      border: none;
+      background: black;
+      color: white;
+      cursor: pointer;
+    }
+
+    audio {
+      margin-top: 30px;
+      width: 90%;
+      max-width: 400px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🎵 Et cest parti...</h1>
+
+<button onclick="playAudio()">
+▶️ Écouter
+</button>
+
+<br>
+  
+<audio id="audio" controls>
+  <source src="Nâdiya - Et cest parti_cut.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  function playAudio() {
+    document.getElementById('audio').play();
+  }
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

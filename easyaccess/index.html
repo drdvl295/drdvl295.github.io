@@ -50,7 +50,7 @@
     "IC33": "Les Toits Versaillais",
     "IC02": "Boitier chez Delphine",
     "IC14": "Le Petit Fontenay"
-  }; 
+  };
   document.getElementById("sub").textContent = logement ? (LOGEMENTS[logement] || "Logement " + logement) : "";
 
   function show(msg, cls) { statusEl.textContent = msg; statusEl.className = cls || ""; }
@@ -63,7 +63,8 @@
     show("Envoi en cours, cela peut prendre une dizaine de secondes.");
     try {
       // text/plain : requête « simple », sans pré-vérification CORS
-      const res = await fetch(WEBHOOK, {
+      // Logement et Resa passent dans l’URL (comme l’ancien lien), Make les lit directement
+      const res = await fetch(WEBHOOK + "?Logement=" + encodeURIComponent(logement) + "&Resa=" + encodeURIComponent(resa), {
         method: "POST",
         headers: { "Content-Type": "text/plain" },
         body: JSON.stringify({ Logement: logement, Resa: resa })

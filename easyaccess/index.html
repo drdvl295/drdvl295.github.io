@@ -33,7 +33,7 @@
 
 <script>
   // À MODIFIER : URL de votre webhook Make (sans paramètres)
-  //const WEBHOOK = "https://hook.eu1.make.com/VOTRE_WEBHOOK"; 
+  // const WEBHOOK = "https://hook.eu1.make.com/VOTRE_WEBHOOK";
   const WEBHOOK = "https://hook.eu1.make.com/rzucfv5wkl4ysepjjxinw6ilpaw9yibp";
   const COOLDOWN_MS = 15000;
 
@@ -42,7 +42,14 @@
   const resa = params.get("Resa") || "";
   const btn = document.getElementById("btn");
   const statusEl = document.getElementById("status");
-  document.getElementById("sub").textContent = logement ? "Logement " + logement : "";
+  // À MODIFIER : un logement par ligne, « code »: "nom affiché ». Pensez à la virgule en fin de ligne.
+  const LOGEMENTS = {
+    "IC17": "Appartement Vieille Ville",
+    "IC33": "Les Toits Versaillais",
+    "IC02": "Boitier chez Delphine"
+    "IC14": "Le Petit Fontenay"
+  };
+  document.getElementById("sub").textContent = logement ? (LOGEMENTS[logement] || "Logement " + logement) : "";
 
   function show(msg, cls) { statusEl.textContent = msg; statusEl.className = cls || ""; }
 
@@ -57,7 +64,7 @@
       const res = await fetch(WEBHOOK, {
         method: "POST",
         headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify({ Logement: logement, Resa: resa })               
+        body: JSON.stringify({ Logement: logement, Resa: resa })
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.status === "ok") {

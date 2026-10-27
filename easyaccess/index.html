@@ -1,0 +1,81 @@
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Ouvrir la porte</title>
+<style>
+  :root { --bg:#f3f1ee; --ink:#1d2328; --muted:#5c666e; --btn:#1f4d46; --btn-ink:#fff; --ok:#2e7d4f; --err:#b3392f; color-scheme: light dark; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14181b; --ink:#eef0f1; --muted:#9aa4ab; --btn:#4fae9c; --btn-ink:#0c1512; --ok:#6fcf97; --err:#ff8a7e; } }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; display: grid; place-items: center; padding: 24px; }
+  main { text-align: center; max-width: 360px; width: 100%; }
+  h1 { font-size: 1.4rem; margin: 0 0 6px; font-weight: 600; }
+  .sub { color: var(--muted); margin: 0 0 36px; }
+  button { width: 200px; height: 200px; border-radius: 50%; border: 0; background: var(--btn); color: var(--btn-ink); font-size: 1.5rem; font-weight: 600; cursor: pointer; transition: transform .15s, background .2s; }
+  button:active:not(:disabled) { transform: scale(.96); }
+  button:focus-visible { outline: 4px solid var(--ink); outline-offset: 4px; }
+  button:disabled { cursor: default; opacity: .75; }
+  button.ok { background: var(--ok); }
+  #status { min-height: 3.2em; margin-top: 32px; font-size: 1.05rem; }
+  #status.ok { color: var(--ok); } #status.err { color: var(--err); }
+  @media (prefers-reduced-motion: reduce) { button { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Porte de l’immeuble</h1>
+  <p class="sub" id="sub"></p>
+  <button id="btn" type="button">Ouvrir</button>
+  <div id="status" role="status" aria-live="polite"></div>
+</main>
+
+<script>
+  // À MODIFIER : URL de votre webhook Make (sans paramètres)
+  //const WEBHOOK = "https://hook.eu1.make.com/VOTRE_WEBHOOK"; 
+  const WEBHOOK = "https://hook.eu1.make.com/rzucfv5wkl4ysepjjxinw6ilpaw9yibp";
+  const COOLDOWN_MS = 15000;
+
+  const params = new URLSearchParams(location.search);
+  const logement = params.get("Logement");
+  // WARNING : Une fois que le paramètre resa sera implementé, ajouter cette ligne
+  //const resa = params.get("Resa") || "";
+  const btn = document.getElementById("btn");
+  const statusEl = document.getElementById("status");
+  document.getElementById("sub").textContent = logement ? "Logement " + logement : "";
+
+  function show(msg, cls) { statusEl.textContent = msg; statusEl.className = cls || ""; }
+
+  if (!logement) { btn.disabled = true; show("Lien incomplet. Contactez votre hôte.", "err"); }
+
+  btn.addEventListener("click", async () => {
+    if (btn.disabled) return;
+    btn.disabled = true; btn.classList.remove("ok"); btn.textContent = "Envoi…";
+    show("Envoi en cours, cela peut prendre une dizaine de secondes.");
+    try {
+      // text/plain : requête « simple », sans pré-vérification CORS
+      const res = await fetch(WEBHOOK, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        // WARNING : Une fois que le paramètre resa sera implementé, remplacer la ligne par celle-ci
+        //body: JSON.stringify({ Logement: logement, Resa: resa })       
+        body: JSON.stringify({ Logement: logement })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.status === "ok") {
+        btn.classList.add("ok"); btn.textContent = "Ouverte";
+        show("La porte est ouverte. Vous pouvez entrer.", "ok");
+      } else {
+        show(data.message || "L’ouverture a échoué. Réessayez dans un instant ou contactez votre hôte.", "err");
+        btn.textContent = "Ouvrir";
+      }
+    } catch (e) {
+      show("Pas de réponse. Vérifiez votre connexion, puis réessayez.", "err");
+      btn.textContent = "Ouvrir";
+    }
+    setTimeout(() => { btn.disabled = !logement; if (!btn.disabled) btn.textContent = "Ouvrir"; btn.classList.remove("ok"); }, COOLDOWN_MS);
+  });
+</script>
+</body>
+</html>

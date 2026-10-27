@@ -39,8 +39,7 @@
 
   const params = new URLSearchParams(location.search);
   const logement = params.get("Logement");
-  // WARNING : Une fois que le paramètre resa sera implementé, ajouter cette ligne
-  //const resa = params.get("Resa") || "";
+  const resa = params.get("Resa") || "";
   const btn = document.getElementById("btn");
   const statusEl = document.getElementById("status");
   document.getElementById("sub").textContent = logement ? "Logement " + logement : "";
@@ -58,9 +57,7 @@
       const res = await fetch(WEBHOOK, {
         method: "POST",
         headers: { "Content-Type": "text/plain" },
-        // WARNING : Une fois que le paramètre resa sera implementé, remplacer la ligne par celle-ci
-        //body: JSON.stringify({ Logement: logement, Resa: resa })       
-        body: JSON.stringify({ Logement: logement })
+        body: JSON.stringify({ Logement: logement, Resa: resa })               
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.status === "ok") {
